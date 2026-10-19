@@ -1,1432 +1,418 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Laboratório interativo sobre energia solar, Física, programação e robótica.">
-  <title>Sol & Água LAB | Piscina Inteligente</title>
-
-  <style>
-    :root {
-      --bg: #f3faff;
-      --surface: #ffffff;
-      --surface2: #e4f4fa;
-      --text: #123044;
-      --muted: #526c7a;
-      --blue: #087eaa;
-      --cyan: #23b4d2;
-      --orange: #ffb52e;
-      --green: #16865a;
-      --red: #bd4c32;
-      --border: #c8dce7;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 90px;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
-    }
-
-    body.high-contrast {
-      --bg: #000;
-      --surface: #000;
-      --surface2: #111;
-      --text: #fff;
-      --muted: #fff;
-      --border: #fff;
-      --blue: #00e5ff;
-      --cyan: #00e5ff;
-      --orange: #ff0;
-    }
-
-    body.readable {
-      font-family: Verdana, Arial, sans-serif;
-      letter-spacing: 0.04em;
-      word-spacing: 0.08em;
-      line-height: 1.9;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button,
-    a,
-    input,
-    select {
-      outline-offset: 4px;
-    }
-
-    button:focus-visible,
-    a:focus-visible,
-    input:focus-visible,
-    select:focus-visible {
-      outline: 3px solid var(--orange);
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .skip-link {
-      position: absolute;
-      left: -9999px;
-      top: 0;
-      padding: 12px;
-      background: var(--surface);
-      z-index: 100;
-    }
-
-    .skip-link:focus {
-      left: 10px;
-    }
-
-    .container {
-      width: min(1120px, 92%);
-      margin: auto;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .navbar {
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      text-decoration: none;
-      font-weight: 900;
-      font-size: 1.15rem;
-    }
-
-    .brand span {
-      color: var(--blue);
-    }
-
-    nav {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    nav a:hover {
-      color: var(--blue);
-    }
-
-    .accessibility {
-      display: flex;
-      gap: 6px;
-    }
-
-    .btn,
-    .accessibility button {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 9px 13px;
-      background: var(--surface);
-      color: var(--text);
-    }
-
-    .btn.primary {
-      background: var(--blue);
-      color: white;
-      border-color: var(--blue);
-      font-weight: bold;
-    }
-
-    .hero {
-      padding: 65px 0 45px;
-      background:
-        radial-gradient(circle at 85% 20%, #ffcf6c88, transparent 28%),
-        var(--bg);
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 35px;
-      align-items: center;
-    }
-
-    .eyebrow {
-      color: var(--blue);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-
-    h1 {
-      font-size: clamp(2.6rem, 6vw, 4.8rem);
-      line-height: 1.05;
-      letter-spacing: -2px;
-      margin: 12px 0;
-    }
-
-    h2 {
-      font-size: clamp(1.8rem, 4vw, 2.7rem);
-      line-height: 1.15;
-    }
-
-    .gradient {
-      color: var(--blue);
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 1.1rem;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 22px 0;
-    }
-
-    .actions a {
-      text-decoration: none;
-    }
-
-    .hero-art {
-      min-height: 310px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 25px;
-      background: linear-gradient(145deg, #b8eff5, #e9f9ff 55%, #ffe0a1);
-      color: #123648;
-    }
-
-    .sun {
-      position: absolute;
-      top: 35px;
-      right: 55px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #ffb52e;
-      box-shadow: 0 0 0 20px #ffbf4d33;
-    }
-
-    .solar-panel {
-      position: absolute;
-      left: 35px;
-      top: 105px;
-      width: 48%;
-      height: 85px;
-      transform: skewY(-10deg);
-      border: 5px solid white;
-      border-radius: 8px;
-      background: repeating-linear-gradient(
-        90deg,
-        #0c7199 0 3px,
-        #3bb6d4 3px 35px
-      );
-    }
-
-    .pool {
-      position: absolute;
-      bottom: 35px;
-      left: 30px;
-      right: 30px;
-      height: 85px;
-      border: 7px solid white;
-      border-radius: 15px;
-      background: repeating-linear-gradient(
-        0deg,
-        #24b8d6 0 12px,
-        #64d6e4 12px 16px
-      );
-    }
-
-    .hero-label {
-      position: absolute;
-      bottom: 8px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-
-    section {
-      padding: 55px 0;
-    }
-
-    .section-head {
-      max-width: 750px;
-      margin-bottom: 25px;
-    }
-
-    .section-head p,
-    .card p {
-      color: var(--muted);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .card {
-      min-width: 0;
-      padding: 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-    }
-
-    .card h3 {
-      margin-top: 5px;
-    }
-
-    .icon {
-      font-size: 2rem;
-    }
-
-    .lab-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .control {
-      display: grid;
-      gap: 7px;
-      margin: 18px 0;
-    }
-
-    .control label {
-      font-weight: bold;
-    }
-
-    .control input[type="range"] {
-      width: 100%;
-      accent-color: var(--blue);
-    }
-
-    .control select {
-      padding: 10px;
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-    }
-
-    .visual {
-      min-height: 155px;
-      padding: 20px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: var(--surface2);
-      overflow: hidden;
-    }
-
-    .readout {
-      padding: 15px;
-      margin-top: 14px;
-      background: var(--surface2);
-      border-radius: 12px;
-    }
-
-    .readout strong {
-      font-size: 1.15rem;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .small {
-      font-size: 0.88rem;
-    }
-
-    .formula {
-      display: block;
-      padding: 12px;
-      border-radius: 10px;
-      background: var(--surface2);
-      font-family: monospace;
-      overflow-wrap: anywhere;
-    }
-
-    .bar {
-      height: 12px;
-      margin: 12px 0;
-      overflow: hidden;
-      background: var(--border);
-      border-radius: 99px;
-    }
-
-    .bar span {
-      display: block;
-      height: 100%;
-      width: 50%;
-      background: linear-gradient(90deg, var(--blue), var(--orange));
-      transition: width 0.2s;
-    }
-
-    .notice {
-      padding: 14px;
-      margin-top: 16px;
-      border-left: 4px solid var(--orange);
-      border-radius: 0 10px 10px 0;
-      background: var(--surface2);
-    }
-
-    .spectrum {
-      display: flex;
-      width: 100%;
-      height: 45px;
-      gap: 3px;
-      overflow: hidden;
-      border-radius: 8px;
-    }
-
-    .spectrum span {
-      flex: 1;
-    }
-
-    .pool-mini {
-      height: 80px;
-      width: 100%;
-      border: 6px solid #8daab7;
-      border-radius: 10px;
-      background: linear-gradient(#57d5e5, #168bb5);
-    }
-
-    .quiz-options {
-      display: grid;
-      gap: 10px;
-      margin: 18px 0;
-    }
-
-    .quiz-options button {
-      padding: 12px;
-      text-align: left;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      color: var(--text);
-    }
-
-    .quiz-options button:hover:not(:disabled) {
-      border-color: var(--blue);
-    }
-
-    .quiz-options button.correct {
-      border: 2px solid var(--green);
-    }
-
-    .quiz-options button.incorrect {
-      border: 2px solid var(--red);
-    }
-
-    .quiz-options button:disabled {
-      cursor: default;
-      opacity: 1;
-    }
-
-    .feedback {
-      min-height: 45px;
-      font-weight: bold;
-    }
-
-    .site-map {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .site-map a {
-      padding: 15px;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-    }
-
-    .site-map a:hover {
-      border-color: var(--blue);
-    }
-
-    footer {
-      padding: 30px 0;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    @media (max-width: 900px) {
-      .navbar {
-        align-items: flex-start;
-        padding: 15px 0;
-        flex-wrap: wrap;
-      }
-
-      nav {
-        width: 100%;
-      }
-
-      .hero-grid,
-      .lab-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .site-map {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 560px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-art {
-        min-height: 260px;
-      }
-
-      .hero {
-        padding-top: 40px;
-      }
-
-      .site-map {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .accessibility {
-        flex-wrap: wrap;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-      }
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Laboratório interativo sobre energia solar, ondas eletromagnéticas, corpo negro, efeito fotoelétrico e sensores aplicados a uma piscina sustentável.">
+  <title>Sol & Água | Laboratório de Piscina Inteligente</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
-
 <body>
-  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
-  <header>
-    <div class="container navbar">
-      <a class="brand" href="#inicio">☀ Sol & Água <span>LAB</span></a>
+<header class="topbar">
+  <div class="wrap nav">
+    <a class="brand" href="#inicio" aria-label="Sol e Água Inteligente, início">
+      <span class="logo" aria-hidden="true">☀</span>
+      <span>Sol & Água <span class="muted">LAB</span></span>
+    </a>
 
-      <nav aria-label="Navegação principal">
-        <a href="#projeto">Projeto</a>
-        <a href="#ondas">Ondas</a>
-        <a href="#corpo-negro">Corpo negro</a>
-        <a href="#fotoeletrico">Fotoelétrico</a>
-        <a href="#laboratorio">Laboratório</a>
-        <a href="#sensores">Sensores</a>
-        <a href="#quiz">Quiz</a>
-      </nav>
+    <nav id="navlinks" class="navlinks" aria-label="Navegação principal">
+      <a href="#projeto">Projeto</a>
+      <a href="#ondas">Ondas</a>
+      <a href="#corpo-negro">Corpo negro</a>
+      <a href="#fotoeletrico">Fotoelétrico</a>
+      <a href="#sensores">Sensores</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#mapa">Mapa do site</a>
+    </nav>
 
-      <div class="accessibility">
-        <button id="contrastBtn" type="button" aria-pressed="false">
-          ◐ Contraste
-        </button>
-        <button id="readableBtn" type="button" aria-pressed="false">
-          Aa Leitura
-        </button>
+    <div class="tools">
+      <button class="iconbtn" id="contrastBtn" type="button" aria-pressed="false" title="Alternar alto contraste">◐ <span class="small">Contraste</span></button>
+      <button class="iconbtn" id="dyslexiaBtn" type="button" aria-pressed="false" title="Alternar fonte amigável à leitura">Aa</button>
+      <button class="iconbtn mobile-menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="navlinks">☰ <span class="small">Menu</span></button>
+    </div>
+  </div>
+</header>
+
+<main id="conteudo">
+  <section class="hero" id="inicio">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Ciência • Programação • Robótica</div>
+        <h1>Uma piscina mais <span class="gradient">inteligente.</span></h1>
+        <p class="lead">Explore como a energia do Sol, a Física e os sensores podem trabalhar juntos para aquecer a água, reduzir desperdícios e tornar a tecnologia mais acessível.</p>
+        <div class="actions">
+          <a class="btn primary" href="#laboratorio">Explorar simuladores ↓</a>
+          <a class="btn" href="#projeto">Conhecer o projeto</a>
+        </div>
+        <p class="small muted">Laboratório educativo interativo • Navegação por teclado • Layout adaptável</p>
+      </div>
+
+      <div class="hero-art" role="img" aria-label="Ilustração de Sol, painel solar e piscina azul">
+        <div class="sun"></div>
+        <div class="panel"></div>
+        <div class="pool"></div>
+        <div class="float-tag tag1">☀ Energia solar</div>
+        <div class="float-tag tag2">≈ Água + tecnologia</div>
+        <div class="hero-art-label">CAPTAR · TRANSFORMAR · MONITORAR</div>
       </div>
     </div>
-  </header>
 
-  <main id="conteudo">
-    <section class="hero" id="inicio">
-      <div class="container hero-grid">
-        <div>
-          <div class="eyebrow">Ciência • Programação • Robótica</div>
-          <h1>Uma piscina mais <span class="gradient">inteligente.</span></h1>
+    <div class="wrap stats">
+      <div class="stat"><strong>3 áreas</strong><span>Física, programação e robótica</span></div>
+      <div class="stat"><strong>4 experiências</strong><span>Simuladores e teste de conhecimentos</span></div>
+      <div class="stat"><strong>Acessível</strong><span>Contraste, leitura e teclado</span></div>
+    </div>
+  </section>
 
-          <p class="lead">
-            Descubra como a energia do Sol, a Física e os sensores podem
-            aquecer uma piscina, economizar energia e reduzir desperdícios.
-          </p>
+  <section id="projeto">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">01 / O desafio</div>
+        <h2>Como a ciência ajuda a piscina?</h2>
+        <p>A proposta é combinar aquecimento solar, geração de eletricidade e sensores para tomar decisões com base em dados — sem desperdiçar energia ou água.</p>
+      </div>
 
-          <div class="actions">
-            <a class="btn primary" href="#laboratorio">
-              Explorar simuladores ↓
-            </a>
-            <a class="btn" href="#projeto">Conhecer o projeto</a>
+      <div class="cards">
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🌞</div>
+          <h3>Coletor solar térmico</h3>
+          <p>Uma superfície absorve radiação solar e transfere energia térmica para a água que circula no sistema.</p>
+          <span class="pill">Aquecimento direto</span>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🔋</div>
+          <h3>Painel fotovoltaico</h3>
+          <p>Converte parte da energia luminosa em eletricidade, que pode alimentar equipamentos compatíveis, como bombas.</p>
+          <span class="pill">Energia elétrica</span>
+        </article>
+
+        <article class="card">
+          <div class="emoji" aria-hidden="true">🛟</div>
+          <h3>Capa térmica</h3>
+          <p>Ajuda a diminuir a evaporação e a perda de calor, especialmente quando a piscina não está em uso.</p>
+          <span class="pill">Conservação de calor</span>
+        </article>
+      </div>
+
+      <div class="notice" style="margin-top:1rem">
+        <strong>Ideia central:</strong> o coletor térmico e o painel fotovoltaico têm funções diferentes. Um aquece a água diretamente; o outro gera eletricidade. A escolha depende do objetivo e do projeto.
+      </div>
+    </div>
+  </section>
+
+  <section id="ondas" class="section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">02 / Tecnociência</div>
+        <h2>Ondas eletromagnéticas</h2>
+        <p>São oscilações de campos elétricos e magnéticos que transportam energia. A luz solar é uma mistura de frequências diferentes.</p>
+      </div>
+
+      <div class="labgrid">
+        <article class="card">
+          <h3>Explore o espectro</h3>
+          <p class="small">Selecione uma região para ver como ela se relaciona com a piscina.</p>
+
+          <div class="spectrum" role="img" aria-label="Faixas do espectro eletromagnético">
+            <span style="background:#6937a5"></span>
+            <span style="background:#3c59cc"></span>
+            <span style="background:#2c9eec"></span>
+            <span style="background:#4dbb80"></span>
+            <span style="background:#e9d343"></span>
+            <span style="background:#ef9b37"></span>
+            <span style="background:#e65346"></span>
+            <span style="background:linear-gradient(90deg,#d84a48,#7c2b2b)"></span>
           </div>
 
-          <p class="small muted">
-            Laboratório educativo interativo e responsivo.
-          </p>
-        </div>
+          <div class="control">
+            <label for="spectrumSelect">Região do espectro</label>
+            <select id="spectrumSelect">
+              <option value="visivel">Luz visível</option>
+              <option value="infra">Infravermelho</option>
+              <option value="uv">Ultravioleta</option>
+              <option value="micro">Micro-ondas</option>
+            </select>
+          </div>
 
-        <div
-          class="hero-art"
-          role="img"
-          aria-label="Ilustração do Sol, de um painel solar e de uma piscina"
-        >
-          <div class="sun"></div>
-          <div class="solar-panel"></div>
-          <div class="pool"></div>
-          <div class="hero-label">CAPTAR · TRANSFORMAR · MONITORAR</div>
-        </div>
+          <div class="readout" aria-live="polite">
+            <strong id="spectrumTitle">Luz visível</strong>
+            <p id="spectrumText">É a faixa que nossos olhos detectam. Parte dela é absorvida por superfícies e convertida em energia térmica.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Comprimento de onda e frequência</h3>
+          <p>Em uma onda eletromagnética no vácuo, a velocidade da luz é aproximadamente constante.</p>
+          <span class="formula">c = λ × f</span>
+          <p class="small">c = velocidade da luz; λ = comprimento de onda; f = frequência.</p>
+
+          <div class="visual">
+            <svg class="wave" viewBox="0 0 420 110" role="img" aria-label="Desenho de uma onda eletromagnética">
+              <path id="wavePath" d="M0 55 Q20 10 40 55 T80 55 T120 55 T160 55 T200 55 T240 55 T280 55 T320 55 T360 55 T400 55"/>
+              <path class="wave2" d="M0 55 Q10 25 20 55 T40 55 T60 55 T80 55 T100 55 T120 55 T140 55 T160 55 T180 55 T200 55 T220 55 T240 55 T260 55 T280 55 T300 55 T320 55 T340 55 T360 55 T380 55 T400 55"/>
+            </svg>
+          </div>
+
+          <p class="small muted">Em geral, maior frequência significa maior energia por fóton: E = h × f.</p>
+        </article>
       </div>
-    </section>
-
-    <section id="projeto">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">01 / O desafio</div>
-          <h2>Como a ciência ajuda a piscina?</h2>
-          <p>
-            A proposta combina aquecimento solar, geração de eletricidade
-            e sensores para tomar decisões com base em dados.
-          </p>
-        </div>
-
-        <div class="cards">
-          <article class="card">
-            <div class="icon" aria-hidden="true">🌞</div>
-            <h3>Coletor solar térmico</h3>
-            <p>
-              Absorve a radiação solar e transfere energia térmica para
-              a água que circula pelo sistema.
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="icon" aria-hidden="true">🔋</div>
-            <h3>Painel fotovoltaico</h3>
-            <p>
-              Converte parte da energia luminosa em eletricidade para
-              alimentar equipamentos compatíveis.
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="icon" aria-hidden="true">🛟</div>
-            <h3>Capa térmica</h3>
-            <p>
-              Ajuda a diminuir a evaporação e a perda de calor quando
-              a piscina não está em uso.
-            </p>
-          </article>
-        </div>
-
-        <div class="notice">
-          <strong>Importante:</strong> o coletor térmico aquece a água
-          diretamente. Já o painel fotovoltaico gera eletricidade.
-          São tecnologias diferentes e complementares.
-        </div>
-      </div>
-    </section>
-
-    <section id="ondas" style="background: var(--surface2)">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">02 / Tecnociência</div>
-          <h2>Ondas eletromagnéticas</h2>
-          <p>
-            Transportam energia e não precisam de um meio material para
-            se propagar no vácuo. A luz solar contém diferentes frequências.
-          </p>
-        </div>
-
-        <div class="lab-grid">
-          <article class="card">
-            <h3>Explore o espectro</h3>
-
-            <div class="spectrum" role="img" aria-label="Espectro eletromagnético">
-              <span style="background:#6937a5"></span>
-              <span style="background:#3c59cc"></span>
-              <span style="background:#2c9eec"></span>
-              <span style="background:#4dbb80"></span>
-              <span style="background:#e9d343"></span>
-              <span style="background:#ef9b37"></span>
-              <span style="background:#e65346"></span>
-              <span style="background:#7c2b2b"></span>
-            </div>
-
-            <div class="control">
-              <label for="spectrumSelect">Região do espectro</label>
-              <select id="spectrumSelect">
-                <option value="visivel">Luz visível</option>
-                <option value="infra">Infravermelho</option>
-                <option value="uv">Ultravioleta</option>
-                <option value="micro">Micro-ondas</option>
-              </select>
-            </div>
-
-            <div class="readout" aria-live="polite">
-              <strong id="spectrumTitle">Luz visível</strong>
-              <p id="spectrumText">
-                É a faixa detectada pelos nossos olhos. Parte da luz
-                absorvida pelas superfícies se transforma em energia térmica.
-              </p>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Frequência e comprimento de onda</h3>
-            <p>
-              No vácuo, as ondas eletromagnéticas se propagam à velocidade
-              da luz.
-            </p>
-            <span class="formula">c = λ × f</span>
-            <p class="small">
-              c = velocidade da luz; λ = comprimento de onda; f = frequência.
-            </p>
-            <span class="formula">E = h × f</span>
-            <p class="small">
-              A energia de cada fóton aumenta quando a frequência aumenta.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="corpo-negro">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">03 / Radiação térmica</div>
-          <h2>O que é um corpo negro?</h2>
-          <p>
-            É um modelo ideal que absorve toda a radiação incidente e emite
-            radiação térmica conforme sua temperatura.
-          </p>
-        </div>
-
-        <div class="lab-grid">
-          <article class="card">
-            <h3>Simulador de temperatura</h3>
-            <p class="small">
-              Aumente a temperatura e observe a representação visual.
-            </p>
-
-            <div class="control">
-              <label for="tempSlider">
-                Temperatura: <output id="tempOut">500 K</output>
-              </label>
-              <input
-                id="tempSlider"
-                type="range"
-                min="250"
-                max="1200"
-                step="10"
-                value="500"
-              >
-            </div>
-
-            <div class="visual">
-              <div
-                id="glow"
-                style="width:100px;height:100px;border-radius:50%;background:#e56b2f;box-shadow:0 0 30px #e56b2f88"
-                role="img"
-                aria-label="Representação da emissão térmica"
-              ></div>
-            </div>
-
-            <div class="readout" aria-live="polite">
-              <strong id="tempMood">Emissão principalmente infravermelha</strong>
-              <p id="tempDesc" class="small">
-                A emissão ocorre principalmente no infravermelho.
-              </p>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Ligação com a piscina</h3>
-            <h4>Durante o dia</h4>
-            <p>
-              O coletor absorve a radiação solar e transfere calor para a água.
-            </p>
-            <h4>Durante a noite</h4>
-            <p>
-              A água troca energia com o ambiente, inclusive por radiação
-              infravermelha, convecção e evaporação.
-            </p>
-            <h4>Como reduzir perdas?</h4>
-            <p>
-              A capa térmica reduz principalmente a evaporação e ajuda
-              a conservar o calor.
-            </p>
-            <div class="notice">
-              Uma piscina real não é um corpo negro perfeito.
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="fotoeletrico" style="background: var(--surface2)">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">04 / Luz e elétrons</div>
-          <h2>Efeito fotoelétrico</h2>
-          <p>
-            Fótons com energia suficiente podem liberar elétrons de um
-            material. Esse fenômeno contribuiu para o desenvolvimento
-            da Física quântica.
-          </p>
-        </div>
-
-        <div class="lab-grid">
-          <article class="card">
-            <h3>Experimento de frequência</h3>
-
-            <div class="control">
-              <label for="freqSlider">
-                Frequência relativa: <output id="freqOut">6</output>
-              </label>
-              <input
-                id="freqSlider"
-                type="range"
-                min="1"
-                max="10"
-                value="6"
-              >
-            </div>
-
-            <div class="control">
-              <label for="thresholdSelect">Material de exemplo</label>
-              <select id="thresholdSelect">
-                <option value="4">Material A — limiar 4</option>
-                <option value="6" selected>Material B — limiar 6</option>
-                <option value="8">Material C — limiar 8</option>
-              </select>
-            </div>
-
-            <div class="visual">
-              <div
-                id="lightBeam"
-                style="width:100%;height:10px;background:linear-gradient(90deg,#f7d34a,#f28b22);border-radius:99px"
-              ></div>
-              <strong id="electronGlyph">e⁻ e⁻</strong>
-            </div>
-
-            <div class="readout" aria-live="polite">
-              <strong id="photoStatus">Emissão possível</strong>
-              <p id="photoText" class="small">
-                O modelo compara a frequência com o limiar do material.
-              </p>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Conexão com a energia solar</h3>
-            <p>
-              Nas células fotovoltaicas, a luz pode excitar cargas elétricas
-              em um semicondutor, permitindo gerar corrente elétrica.
-            </p>
-            <span class="formula">E = h × f</span>
-            <div class="notice">
-              O efeito fotoelétrico externo e o efeito fotovoltaico são
-              fenômenos relacionados, mas não são exatamente a mesma coisa.
-              Painéis solares comuns operam pelo efeito fotovoltaico.
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="laboratorio">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">05 / Laboratório interativo</div>
-          <h2>Simulador de aquecimento</h2>
-          <p>
-            Mude as variáveis e observe como elas afetam o sistema.
-            Os valores são ilustrativos, não especificações de instalação.
-          </p>
-        </div>
-
-        <div class="lab-grid">
-          <article class="card">
-            <h3>Energia solar disponível</h3>
-
-            <div class="control">
-              <label for="sunSlider">
-                Intensidade solar: <output id="sunOut">75%</output>
-              </label>
-              <input
-                id="sunSlider"
-                type="range"
-                min="0"
-                max="100"
-                value="75"
-              >
-            </div>
-
-            <div class="control">
-              <label for="coverSelect">Capa térmica à noite</label>
-              <select id="coverSelect">
-                <option value="yes">Usar capa</option>
-                <option value="no">Sem capa</option>
-              </select>
-            </div>
-
-            <div class="visual">
-              <div class="pool-mini" aria-label="Piscina simulada"></div>
-            </div>
-
-            <div class="readout">
-              <strong id="heatOut">75 / 100</strong>
-              <div class="bar"><span id="heatBar" style="width:75%"></span></div>
-              <p id="coverText" class="small">
-                A capa ajuda a reduzir perdas de calor e evaporação.
-              </p>
-            </div>
-          </article>
-
-          <article class="card" id="sensores">
-            <h3>Painel de sensores</h3>
-            <p class="small">Simule as leituras do sistema.</p>
-
-            <div class="control">
-              <label for="waterTemp">
-                Temperatura da água:
-                <output id="waterTempOut">25 °C</output>
-              </label>
-              <input
-                id="waterTemp"
-                type="range"
-                min="10"
-                max="40"
-                value="25"
-              >
-            </div>
-
-            <div class="control">
-              <label for="brightness">
-                Luminosidade: <output id="brightnessOut">70%</output>
-              </label>
-              <input
-                id="brightness"
-                type="range"
-                min="0"
-                max="100"
-                value="70"
-              >
-            </div>
-
-            <div class="control">
-              <label for="waterLevel">Nível da água</label>
-              <select id="waterLevel">
-                <option value="normal">Normal</option>
-                <option value="baixo">Baixo</option>
-                <option value="alto">Alto</option>
-              </select>
-            </div>
-
-            <div class="readout" aria-live="polite">
-              <strong id="sensorStatus">Monitoramento normal</strong>
-              <p id="sensorAdvice" class="small">
-                O controlador continua monitorando a piscina.
-              </p>
-            </div>
-          </article>
-        </div>
-
-        <div class="cards" style="margin-top:16px">
-          <article class="card">
-            <div class="icon">🌡️</div>
-            <h3>Sensor de temperatura</h3>
-            <p>Mede a temperatura da água.</p>
-          </article>
-          <article class="card">
-            <div class="icon">💡</div>
-            <h3>Sensor de luminosidade</h3>
-            <p>Ajuda a estimar a disponibilidade de luz solar.</p>
-          </article>
-          <article class="card">
-            <div class="icon">📏</div>
-            <h3>Sensor de nível</h3>
-            <p>Ajuda a identificar nível baixo ou alto da água.</p>
-          </article>
-        </div>
-
-        <div class="notice">
-          Esta página é uma simulação educativa. Uma instalação real
-          exige equipamentos adequados e proteções de segurança.
-        </div>
-      </div>
-    </section>
-
-    <section id="quiz" style="background: var(--surface2)">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">06 / Teste seus conhecimentos</div>
-          <h2>Quiz relâmpago</h2>
-          <p>Responda às três perguntas e confira seu resultado.</p>
-        </div>
-
-        <div class="lab-grid">
-          <article class="card">
-            <div class="small" id="quizCount">Pergunta 1 de 3</div>
-            <h3 id="quizQuestion">Qual é a função do coletor solar térmico?</h3>
-
-            <div id="quizOptions" class="quiz-options"></div>
-
-            <div id="quizFeedback" class="feedback" aria-live="polite"></div>
-
-            <button class="btn primary" id="quizNext" type="button" disabled>
-              Próxima pergunta →
-            </button>
-          </article>
-
-          <article class="card">
-            <h3>Resumo para estudar</h3>
-            <h4>Ondas eletromagnéticas</h4>
-            <p>Transportam energia e podem se propagar no vácuo.</p>
-            <h4>Radiação térmica</h4>
-            <p>Todo corpo acima do zero absoluto emite radiação térmica.</p>
-            <h4>Sensores</h4>
-            <p>Medem grandezas físicas para ajudar o sistema a tomar decisões.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="acessibilidade">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">07 / Tecnologia para todos</div>
-          <h2>Acessibilidade</h2>
-          <p>
-            O site inclui navegação por teclado, link para pular ao conteúdo,
-            contraste alternativo e fonte com espaçamento ampliado.
-          </p>
-        </div>
-
-        <div class="cards">
-          <article class="card">
-            <div class="icon">⌨️</div>
-            <h3>Teclado</h3>
-            <p>Use Tab para navegar e Enter ou Espaço para ativar controles.</p>
-          </article>
-          <article class="card">
-            <div class="icon">◐</div>
-            <h3>Contraste</h3>
-            <p>Use o botão de contraste no topo para mudar a aparência.</p>
-          </article>
-          <article class="card">
-            <div class="icon">🤟</div>
-            <h3>Libras</h3>
-            <p>
-              Para cumprir integralmente o requisito, adicione o widget
-              VLibras e teste sua integração após publicar o site.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="mapa" style="background: var(--surface2)">
-      <div class="container">
-        <div class="section-head">
-          <div class="eyebrow">08 / Navegação</div>
-          <h2>Mapa do site</h2>
-          <p>Escolha uma seção para ir diretamente até ela.</p>
-        </div>
-
-        <div class="site-map">
-          <a href="#inicio">☀ Início</a>
-          <a href="#projeto">🏊 Projeto da piscina</a>
-          <a href="#ondas">〰 Ondas eletromagnéticas</a>
-          <a href="#corpo-negro">◉ Corpo negro</a>
-          <a href="#fotoeletrico">⚡ Efeito fotoelétrico</a>
-          <a href="#laboratorio">⚙ Simuladores</a>
-          <a href="#sensores">🌡️ Sensores</a>
-          <a href="#quiz">✓ Quiz</a>
-          <a href="#acessibilidade">♿ Acessibilidade</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      <strong>Sol & Água LAB</strong>
-      <p class="small">
-        Aprender ciência para construir um futuro mais sustentável.
-      </p>
-      <a href="#inicio">Voltar ao topo ↑</a>
     </div>
-  </footer>
+  </section>
 
-  <script>
-    "use strict";
+  <section id="corpo-negro">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">03 / Radiação térmica</div>
+        <h2>O que é um corpo negro?</h2>
+        <p>É um modelo ideal que absorve toda a radiação incidente e emite radiação térmica de acordo com sua temperatura. Objetos reais se aproximam desse comportamento em diferentes graus.</p>
+      </div>
 
-    const $ = id => document.getElementById(id);
+      <div class="labgrid">
+        <article class="card">
+          <h3>Simulador de temperatura</h3>
+          <p class="small">Aumente a temperatura para observar a mudança na emissão térmica.</p>
 
-    const setText = (id, value) => {
-      const element = $(id);
-      if (element) element.textContent = value;
-    };
+          <div class="control">
+            <label for="tempSlider">Temperatura do objeto: <output id="tempOut">500 K</output></label>
+            <input id="tempSlider" type="range" min="250" max="1200" step="10" value="500">
+          </div>
 
-    // ACESSIBILIDADE
-    $("contrastBtn").addEventListener("click", () => {
-      const active = document.body.classList.toggle("high-contrast");
-      $("contrastBtn").setAttribute("aria-pressed", String(active));
-    });
+          <div class="visual">
+            <div id="glow" class="glow" role="img" aria-label="Representação visual da emissão térmica"></div>
+          </div>
 
-    $("readableBtn").addEventListener("click", () => {
-      const active = document.body.classList.toggle("readable");
-      $("readableBtn").setAttribute("aria-pressed", String(active));
-    });
+          <div class="readout">
+            <strong id="tempMood">Emissão predominantemente infravermelha</strong>
+            <p id="tempDesc" class="small">A emissão de um objeto nessa temperatura é principalmente infravermelha.</p>
+          </div>
+        </article>
 
-    // ESPECTRO ELETROMAGNÉTICO
-    const spectrumData = {
-      visivel: [
-        "Luz visível",
-        "É a faixa detectada pelos nossos olhos. Parte da luz absorvida pelas superfícies se transforma em calor."
-      ],
-      infra: [
-        "Infravermelho",
-        "Está associado à emissão térmica dos objetos e às trocas de energia entre a piscina e o ambiente."
-      ],
-      uv: [
-        "Ultravioleta",
-        "Tem frequência maior que a luz visível. A exposição excessiva pode causar danos à pele e aos olhos."
-      ],
-      micro: [
-        "Micro-ondas",
-        "São utilizadas em comunicações e em aplicações específicas de aquecimento."
-      ]
-    };
+        <article class="card">
+          <h3>Ligação com a piscina</h3>
+          <div class="steps">
+            <div class="step"><div><strong>Durante o dia</strong><p class="muted">O coletor absorve radiação solar e transfere calor para a água.</p></div></div>
+            <div class="step"><div><strong>À noite</strong><p class="muted">A água e as superfícies trocam energia com o ambiente, inclusive por radiação infravermelha.</p></div></div>
+            <div class="step"><div><strong>Como reduzir perdas?</strong><p class="muted">A capa reduz principalmente a evaporação; também diminui algumas trocas de calor com o ambiente.</p></div></div>
+          </div>
 
-    $("spectrumSelect").addEventListener("change", event => {
-      const data = spectrumData[event.target.value];
-      setText("spectrumTitle", data[0]);
-      setText("spectrumText", data[1]);
-    });
+          <div class="notice">
+            <strong>Importante:</strong> a piscina não é um corpo negro perfeito. A perda de calor também ocorre por evaporação, convecção e condução.
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 
-    // SIMULADOR DE CORPO NEGRO
-    function updateTemperature() {
-      const temperature = Number($("tempSlider").value);
-      const progress = (temperature - 250) / 950;
+  <section id="fotoeletrico" class="section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">04 / Luz e elétrons</div>
+        <h2>Efeito fotoelétrico</h2>
+        <p>Quando a luz tem frequência suficiente, seus fótons podem fornecer energia para liberar elétrons de um material. O fenômeno ajudou a mostrar que a luz também troca energia em pacotes chamados fótons.</p>
+      </div>
 
-      setText("tempOut", temperature + " K");
+      <div class="labgrid">
+        <article class="card">
+          <h3>Experimento de frequência</h3>
+          <p class="small">Mude a frequência da luz e compare com a frequência mínima necessária para o material.</p>
 
-      const red = Math.round(210 + 45 * progress);
-      const green = Math.round(65 + 110 * progress);
-      const blue = Math.round(30 + 190 * progress);
+          <div class="control">
+            <label for="freqSlider">Frequência relativa da luz: <output id="freqOut">6</output></label>
+            <input id="freqSlider" type="range" min="1" max="10" value="6">
+          </div>
 
-      $("glow").style.background =
-        `rgb(${red}, ${green}, ${blue})`;
+          <div class="control">
+            <label for="thresholdSelect">Material de exemplo</label>
+            <select id="thresholdSelect">
+              <option value="4">Material A — limiar 4</option>
+              <option value="6" selected>Material B — limiar 6</option>
+              <option value="8">Material C — limiar 8</option>
+            </select>
+          </div>
 
-      $("glow").style.boxShadow =
-        `0 0 ${15 + 45 * progress}px rgba(${red}, ${green}, ${blue}, .7)`;
+          <div class="visual photo-visual">
+            <div id="lightBeam" class="light-beam"></div>
+            <div class="electron-row" aria-hidden="true">▤ → <span id="electronGlyph">e⁻ e⁻</span></div>
+          </div>
 
-      if (temperature < 650) {
-        setText("tempMood", "Emissão principalmente infravermelha");
-        setText(
-          "tempDesc",
-          "A emissão térmica ocorre sobretudo no infravermelho, invisível aos olhos."
-        );
-      } else if (temperature < 950) {
-        setText("tempMood", "Emissão mais intensa");
-        setText(
-          "tempDesc",
-          "Com maior temperatura, a energia emitida aumenta e o pico se desloca para comprimentos menores."
-        );
-      } else {
-        setText("tempMood", "Temperatura elevada");
-        setText(
-          "tempDesc",
-          "O objeto ideal emite mais energia e seu pico de emissão se desloca para comprimentos menores."
-        );
-      }
-    }
+          <div class="readout" aria-live="polite">
+            <strong id="photoStatus">No limiar: emissão possível</strong>
+            <p id="photoText" class="small">A frequência alcança o limiar do material selecionado.</p>
+          </div>
+        </article>
 
-    $("tempSlider").addEventListener("input", updateTemperature);
-    updateTemperature();
+        <article class="card">
+          <h3>Como isso se conecta à energia solar?</h3>
+          <p>Em células fotovoltaicas, a luz pode excitar portadores de carga em um semicondutor, gerando corrente elétrica quando a célula é construída e conectada adequadamente.</p>
+          <span class="formula">E = h × f</span>
+          <p class="small">E = energia do fóton; h = constante de Planck; f = frequência.</p>
+          <div class="notice">O efeito fotoelétrico externo e o efeito fotovoltaico são relacionados à interação entre luz e matéria, mas não são exatamente o mesmo processo. Painéis solares comuns operam pelo efeito fotovoltaico.</div>
+        </article>
+      </div>
+    </div>
+  </section>
 
-    // SIMULADOR FOTOELÉTRICO
-    function updatePhotoelectric() {
-      const frequency = Number($("freqSlider").value);
-      const threshold = Number($("thresholdSelect").value);
-      const possible = frequency >= threshold;
+  <section id="laboratorio">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">05 / Laboratório interativo</div>
+        <h2>Teste as variáveis</h2>
+        <p>Experimente os controles e observe como um sistema automatizado pode tomar decisões. Os valores são exemplos didáticos, não especificações para instalar equipamentos reais.</p>
+      </div>
 
-      setText("freqOut", frequency);
-      $("lightBeam").style.opacity = String(0.35 + 0.065 * frequency);
-      $("lightBeam").style.height = (6 + frequency) + "px";
+      <div class="labgrid">
+        <article class="card">
+          <h3>Simulador de aquecimento</h3>
 
-      setText(
-        "photoStatus",
-        possible ? "Emissão possível" : "Frequência abaixo do limiar"
-      );
+          <div class="control">
+            <label for="sunSlider">Intensidade solar: <output id="sunOut">75%</output></label>
+            <input id="sunSlider" type="range" min="0" max="100" value="75">
+          </div>
 
-      setText(
-        "photoText",
-        possible
-          ? "Neste modelo, a energia dos fótons é suficiente para liberar elétrons."
-          : "Neste modelo, cada fóton tem energia insuficiente para liberar elétrons."
-      );
+          <div class="control">
+            <label for="coverSelect">Capa térmica à noite</label>
+            <select id="coverSelect">
+              <option value="yes">Usar capa</option>
+              <option value="no">Sem capa</option>
+            </select>
+          </div>
 
-      setText("electronGlyph", possible ? "e⁻  e⁻  e⁻" : "Sem emissão");
-    }
+          <div class="visual">
+            <div class="pool-mini" role="img" aria-label="Ilustração de uma piscina"></div>
+          </div>
 
-    $("freqSlider").addEventListener("input", updatePhotoelectric);
-    $("thresholdSelect").addEventListener("change", updatePhotoelectric);
-    updatePhotoelectric();
+          <div class="readout">
+            <strong class="big" id="heatOut">75 / 100</strong>
+            <span class="small muted">Índice ilustrativo de energia solar disponível</span>
+            <div class="bar"><span id="heatBar" style="width:75%"></span></div>
+            <p id="coverText" class="small">A capa ajuda a reduzir perdas de calor e evaporação quando a piscina não está em uso.</p>
+          </div>
+        </article>
 
-    // SIMULADOR DE AQUECIMENTO SOLAR
-    function updateHeating() {
-      const sun = Number($("sunSlider").value);
+        <article class="card" id="sensores">
+          <h3>Painel de sensores</h3>
+          <p class="small">Simule leituras para ver a resposta do controlador.</p>
 
-      setText("sunOut", sun + "%");
-      setText("heatOut", sun + " / 100");
-      $("heatBar").style.width = sun + "%";
+          <div class="control">
+            <label for="waterTemp">Temperatura da água: <output id="waterTempOut">25 °C</output></label>
+            <input id="waterTemp" type="range" min="10" max="40" value="25">
+          </div>
 
-      setText(
-        "coverText",
-        $("coverSelect").value === "yes"
-          ? "A capa ajuda a reduzir a evaporação e a perda de calor quando a piscina não está em uso."
-          : "Sem capa, a evaporação costuma aumentar e pode levar a maior perda de calor."
-      );
-    }
+          <div class="control">
+            <label for="brightness">Luminosidade: <output id="brightnessOut">70%</output></label>
+            <input id="brightness" type="range" min="0" max="100" value="70">
+          </div>
 
-    $("sunSlider").addEventListener("input", updateHeating);
-    $("coverSelect").addEventListener("change", updateHeating);
-    updateHeating();
+          <div class="control">
+            <label for="waterLevel">Nível da água</label>
+            <select id="waterLevel">
+              <option value="normal">Normal</option>
+              <option value="baixo">Baixo</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
 
-    // PAINEL DE SENSORES
-    function updateSensors() {
-      const temperature = Number($("waterTemp").value);
-      const brightness = Number($("brightness").value);
-      const level = $("waterLevel").value;
+          <div class="readout" aria-live="polite">
+            <div class="status"><span class="dot" id="statusDot"></span><strong id="sensorStatus">Monitoramento normal</strong></div>
+            <p id="sensorAdvice" class="small">Temperatura e luminosidade dentro das condições simuladas. O controlador continua monitorando.</p>
+          </div>
+        </article>
+      </div>
 
-      setText("waterTempOut", temperature + " °C");
-      setText("brightnessOut", brightness + "%");
+      <div class="cards extra-cards">
+        <article class="card"><div class="emoji">🌡️</div><h3>Sensor de temperatura</h3><p>Mede a temperatura da água para avaliar se o aquecimento é necessário.</p></article>
+        <article class="card"><div class="emoji">💡</div><h3>Sensor de luminosidade</h3><p>Estima a disponibilidade de luz para apoiar decisões sobre aproveitamento solar.</p></article>
+        <article class="card"><div class="emoji">📏</div><h3>Sensor de nível</h3><p>Ajuda a detectar nível baixo ou alto e pode acionar alertas de manutenção.</p></article>
+      </div>
 
-      let title = "Monitoramento normal";
-      let advice = "O controlador continua monitorando as condições simuladas.";
-      let color = "var(--green)";
+      <div class="notice" style="margin-top:1rem">Em uma instalação real, bombas e aquecedores exigem componentes apropriados, proteção elétrica, lógica de segurança e supervisão profissional. Este site é apenas uma simulação.</div>
+    </div>
+  </section>
 
-      if (level === "baixo") {
-        title = "Alerta: nível baixo";
-        advice = "Verificar o nível. Um sistema real deve seguir sua lógica de segurança.";
-        color = "var(--red)";
-      } else if (level === "alto") {
-        title = "Alerta: nível alto";
-        advice = "Verificar o abastecimento e a drenagem conforme o projeto hidráulico.";
-        color = "var(--orange)";
-      } else if (temperature < 25 && brightness >= 50) {
-        title = "Condição favorável ao aquecimento";
-        advice = "Há luminosidade e a água está abaixo da meta ilustrativa de 25 °C.";
-      } else if (temperature >= 25) {
-        title = "Meta ilustrativa atingida";
-        advice = "A água atingiu 25 °C neste exemplo. Continue monitorando.";
-      } else {
-        title = "Aguardando melhores condições solares";
-        advice = "A luminosidade está baixa. O sistema pode continuar monitorando.";
-        color = "var(--orange)";
-      }
+  <section id="quiz" class="section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">06 / Confira o que aprendeu</div>
+        <h2>Quiz relâmpago</h2>
+        <p>Responda às três perguntas e confira seu resultado.</p>
+      </div>
 
-      setText("sensorStatus", title);
-      setText("sensorAdvice", advice);
-      $("sensorStatus").style.color = color;
-    }
+      <div class="labgrid">
+        <article class="card">
+          <div class="pill" id="quizCount">Pergunta 1 de 3</div>
+          <h3 id="quizQuestion" class="quiz-question">Qual é a principal função de um coletor solar térmico?</h3>
+          <div class="quiz-options" id="quizOptions">
+            <button type="button" data-index="0">Gerar ondas de rádio</button>
+            <button type="button" data-index="1">Transferir energia solar para aquecer a água</button>
+            <button type="button" data-index="2">Medir o nível da piscina</button>
+          </div>
+          <div id="quizFeedback" class="feedback" aria-live="polite"></div>
+          <button class="btn primary" id="quizNext" type="button" disabled>Próxima pergunta →</button>
+        </article>
 
-    ["waterTemp", "brightness", "waterLevel"].forEach(id => {
-      $(id).addEventListener("input", updateSensors);
-      $(id).addEventListener("change", updateSensors);
-    });
+        <article class="card">
+          <h3>Resumo para estudar</h3>
+          <div class="steps">
+            <div class="step"><div><strong>Ondas eletromagnéticas</strong><p class="muted">Transportam energia e não precisam de meio material para se propagar no vácuo.</p></div></div>
+            <div class="step"><div><strong>Radiação térmica</strong><p class="muted">Todo corpo com temperatura acima do zero absoluto emite radiação térmica.</p></div></div>
+            <div class="step"><div><strong>Sensores</strong><p class="muted">Transformam uma grandeza física em um sinal que pode ser medido e usado pelo sistema.</p></div></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 
-    updateSensors();
+  <section id="acessibilidade">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">07 / Tecnologia para todos</div>
+        <h2>Acessibilidade é parte do projeto</h2>
+        <p>Um site acessível precisa ser compreensível, operável e perceptível por diferentes pessoas e tecnologias assistivas.</p>
+      </div>
 
-    // QUIZ INTERATIVO
-    const questions = [
-      {
-        question: "Qual é a principal função de um coletor solar térmico?",
-        answers: [
-          "Gerar ondas de rádio",
-          "Transferir energia solar para aquecer a água",
-          "Medir o nível da piscina"
-        ],
-        correct: 1,
-        explanation: "O coletor absorve radiação e transfere energia térmica para a água."
-      },
-      {
-        question: "O que a capa térmica ajuda a reduzir principalmente?",
-        answers: [
-          "A frequência da luz solar",
-          "A evaporação e a perda de calor",
-          "A gravidade"
-        ],
-        correct: 1,
-        explanation: "A capa reduz a evaporação e ajuda a conservar energia térmica."
-      },
-      {
-        question: "Qual sensor mede a temperatura da água?",
-        answers: [
-          "Sensor de temperatura",
-          "Sensor de som apenas",
-          "Sensor de cor"
-        ],
-        correct: 0,
-        explanation: "O sensor de temperatura mede a água e ajuda o controlador a tomar decisões."
-      }
-    ];
+      <div class="cards">
+        <article class="card"><div class="emoji">⌨️</div><h3>Navegação por teclado</h3><p>Use Tab para avançar, Shift + Tab para voltar e Enter ou Espaço para ativar controles. O link “Pular para o conteúdo” aparece ao receber foco.</p></article>
+        <article class="card"><div class="emoji">◐</div><h3>Alto contraste e leitura</h3><p>Use o botão “Contraste” no topo e “Aa” para alternar uma fonte de leitura com espaçamento ampliado.</p></article>
+        <article class="card"><div class="emoji">🤟</div><h3>Libras e VLibras</h3><p>Área preparada para adicionar vídeos em Libras. A integração oficial do VLibras exige incluir o widget e testar sua disponibilidade no ambiente de publicação.</p></article>
+      </div>
 
-    let questionIndex = 0;
-    let score = 0;
-    let answered = false;
-    let finished = false;
+      <p class="small muted" style="margin-top:1rem">Nota: esta demonstração implementa controles básicos de acessibilidade, mas não substitui uma auditoria completa com leitores de tela, avaliação de contraste e testes com usuários.</p>
+    </div>
+  </section>
 
-    function renderQuiz() {
-      finished = false;
-      answered = false;
+  <section id="mapa" class="section-alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">08 / Navegação</div>
+        <h2>Mapa do site</h2>
+        <p>Escolha uma seção para navegar diretamente.</p>
+      </div>
 
-      const question = questions[questionIndex];
+      <div class="site-map">
+        <a href="#inicio">⌂ Início</a>
+        <a href="#projeto">☀ Projeto da piscina</a>
+        <a href="#ondas">〰 Ondas eletromagnéticas</a>
+        <a href="#corpo-negro">◉ Corpo negro</a>
+        <a href="#fotoeletrico">⚡ Efeito fotoelétrico</a>
+        <a href="#laboratorio">⚙ Laboratório e sensores</a>
+        <a href="#quiz">✓ Quiz</a>
+        <a href="#acessibilidade">♿ Acessibilidade</a>
+      </div>
+    </div>
+  </section>
+</main>
 
-      setText(
-        "quizCount",
-        `Pergunta ${questionIndex + 1} de ${questions.length}`
-      );
-
-      setText("quizQuestion", question.question);
-      setText("quizFeedback", "");
-
-      $("quizNext").disabled = true;
-      $("quizNext").textContent =
-        questionIndex === questions.length - 1
-          ? "Ver resultado →"
-          : "Próxima pergunta →";
-
-      $("quizOptions").replaceChildren();
-
-      question.answers.forEach((answer, index) => {
-        const button = document.createElement("button");
-
-        button.type = "button";
-        button.textContent = answer;
-
-        button.addEventListener("click", () => {
-          chooseAnswer(index);
-        });
-
-        $("quizOptions").appendChild(button);
-      });
-    }
-
-    function chooseAnswer(index) {
-      if (answered || finished) return;
-
-      answered = true;
-
-      const question = questions[questionIndex];
-      const buttons = [
-        ...$("quizOptions").querySelectorAll("button")
-      ];
-
-      buttons.forEach((button, buttonIndex) => {
-        button.disabled = true;
-
-        if (buttonIndex === question.correct) {
-          button.classList.add("correct");
-        }
-
-        if (
-          buttonIndex === index &&
-          index !== question.correct
-        ) {
-          button.classList.add("incorrect");
-        }
-      });
-
-      if (index === question.correct) {
-        score++;
-        setText("quizFeedback", "Correto! " + question.explanation);
-      } else {
-        setText("quizFeedback", "Quase! " + question.explanation);
-      }
-
-      $("quizNext").disabled = false;
-    }
-
-    $("quizNext").addEventListener("click", () => {
-      if (finished) {
-        questionIndex = 0;
-        score = 0;
-        renderQuiz();
-        return;
-      }
-
-      if (!answered) return;
-
-      if (questionIndex < questions.length - 1) {
-        questionIndex++;
-        renderQuiz();
-        return;
-      }
-
-      finished = true;
-
-      setText("quizCount", "Quiz concluído");
-      setText(
-        "quizQuestion",
-        `Você acertou ${score} de ${questions.length} perguntas.`
-      );
-
-      $("quizOptions").replaceChildren();
-
-      if (score === 3) {
-        setText("quizFeedback", "Excelente! Você dominou os conceitos.");
-      } else if (score === 2) {
-        setText("quizFeedback", "Muito bem! Revise os tópicos e tente novamente.");
-      } else {
-        setText("quizFeedback", "Revise o resumo e tente novamente.");
-      }
-
-      $("quizNext").textContent = "Refazer quiz";
-      $("quizNext").disabled = false;
-    });
-
-    renderQuiz();
-  </script>
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div><strong>Sol & Água LAB</strong><div class="small">Aprender ciência para projetar um futuro mais sustentável.</div></div>
+    <div class="small">Projeto educacional • Física + Programação + Robótica</div>
+    <a href="#inicio">Voltar ao topo ↑</a>
+  </div>
+</footer>
 </body>
 </html>
